@@ -3,24 +3,31 @@
 namespace ea
 {
 
-evolutionary_algorithm::evolutionary_algorithm() :
+evolutionary_algorithm::evolutionary_algorithm(std::size_t size) :
     development(new basic_development()),
     fitness(new basic_fitness()),
     adult_selection(new basic_adult_selection()),
     parent_selection(new basic_parent_selection()),
-    genetic_operator(new basic_genetic_operator())
+    genetic_operator(new basic_genetic_operator()),
+    ideal_individual(new basic_ideal_individual()),
+    POP_SIZE(size)
 {
+    adult_selection->set_population_size(POP_SIZE);
 }
 
 evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
         basic_fitness* fit, basic_adult_selection* adult,
-        basic_parent_selection* parent, basic_genetic_operator* gen) :
+        basic_parent_selection* parent, basic_genetic_operator* gen,
+        basic_ideal_individual* ideal, std::size_t size) :
     development(dev),
     fitness(fit),
     adult_selection(adult),
     parent_selection(parent),
-    genetic_operator(gen)
+    genetic_operator(gen),
+    ideal_individual(ideal),
+    POP_SIZE(size)
 {
+    adult_selection->set_population_size(POP_SIZE);
 }
 
 evolutionary_algorithm::~evolutionary_algorithm()
@@ -30,10 +37,11 @@ evolutionary_algorithm::~evolutionary_algorithm()
     delete adult_selection;
     delete parent_selection;
     delete genetic_operator;
+    delete ideal_individual;
     free_individuals(population);
 }
 
-void evolutionary_algorithm::simulate_generation()
+basic_individual* evolutionary_algorithm::simulate_generation()
 {
     // develop phenotypes from genotypes
     phenotype_vector phenotypes;
@@ -54,12 +62,23 @@ void evolutionary_algorithm::simulate_generation()
     }
     // adult selection
     (*adult_selection)(young_adults, population);
-    std::cout << "********************Population***********************" << std::endl;
+    // print averages
+    unsigned int fitness_sum = 0;
     for(std::size_t i = 0; i < population.size(); ++i)
     {
-        std::cout << population[i]->info() << std::endl;
+        fitness_sum += population[i]->fitness();
     }
-    
+    //std::cout << "fitness sum: " << fitness_sum << std::endl;
+    //print_individuals(population);
+    // check for the ideal individual if any
+    for(std::size_t i = 0; i < population.size(); ++i)
+    {
+        if((*ideal_individual)(population[i]))
+        {
+            children.clear();
+            return population[i];
+        }
+    }
     // parent selection
     individual_pair_vector parents = (*parent_selection)(population);
     // mate parents
@@ -73,6 +92,8 @@ void evolutionary_algorithm::simulate_generation()
             children.push_back(child[j]);
         }
     }
+
+    return 0;
 }
 
 }

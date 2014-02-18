@@ -9,9 +9,12 @@ namespace ea
 std::vector<basic_genotype*> basic_genetic_operator::operator()(
         const basic_genotype* left_parent, const basic_genotype* right_parent)
 {
-    genotype_pair children = one_crossover(left_parent, right_parent);
-    mutation(children.first);
-    mutation(children.second);
+    // 20-bit 65 pop 1 0.17 0.17
+    genotype_pair children;
+    if(float(rand())/RAND_MAX < 1) children = one_crossover(left_parent, right_parent);
+    else children = std::make_pair(new basic_genotype(*left_parent), new basic_genotype(*right_parent));
+    if(float(rand())/RAND_MAX < 0.17) mutation(children.first);
+    if(float(rand())/RAND_MAX < 0.17) mutation(children.second);
     genotype_vector ret;
     ret.push_back(children.first);
     ret.push_back(children.second);

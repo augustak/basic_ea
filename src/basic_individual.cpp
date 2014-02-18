@@ -30,6 +30,21 @@ std::string basic_individual::info() const
     return ret.str();
 }
 
+bool compare_individuals(basic_individual* lhs, basic_individual* rhs)
+{
+    return *lhs < *rhs;
+}
+
+bool reverse_compare_individuals(basic_individual* lhs, basic_individual* rhs)
+{
+    return *rhs < *lhs;
+}
+
+void free_individual(basic_individual* individual)
+{
+    delete individual;
+}
+
 void free_individuals(std::vector<basic_individual*>& individuals)
 {
     for(std::size_t i = 0; i < individuals.size(); ++i)
@@ -43,7 +58,7 @@ void print_individuals(const std::vector<basic_individual*>& individuals)
 {
     for(std::size_t i = 0; i < individuals.size(); ++i)
     {
-        std::cout << individuals[i]->info() << std::endl;
+        std::cout << "id: " << i << "\t\t" << individuals[i]->info() << std::endl;
     }
 }
 

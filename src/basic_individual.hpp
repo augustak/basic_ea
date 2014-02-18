@@ -26,6 +26,8 @@ class basic_individual
         int fitness() const { return fitness_; }
         // info
         virtual std::string info() const;
+        // comparison operator
+        bool operator<(const basic_individual& rhs) { return fitness_ < rhs.fitness_; }
     private:
         // internal data
         basic_genotype* genotype_;
@@ -33,6 +35,12 @@ class basic_individual
         int fitness_;
 };
 
+// comparison function for basic_individual pointers
+bool compare_individuals(basic_individual*, basic_individual*);
+// reverse comparison function for basic_individual pointers
+bool reverse_compare_individuals(basic_individual*, basic_individual*);
+
+void free_individual(basic_individual*);
 void free_individuals(std::vector<basic_individual*>&);
 void print_individuals(const std::vector<basic_individual*>&);
 

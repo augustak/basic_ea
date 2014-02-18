@@ -11,7 +11,15 @@
 #include "basic_individual.hpp"
 #include "basic_fitness.hpp"
 #include "basic_adult_selection.hpp"
+#include "full_generational_replacement.hpp"
+#include "over_production.hpp"
+#include "generational_mixing.hpp"
+#include "basic_parent_selection.hpp"
+#include "fitness_proportionate.hpp"
+#include "tournament_selection.hpp"
 #include "basic_genetic_operator.hpp"
+#include "basic_ideal_individual.hpp"
+#include "one_max_ideal.hpp"
 #include "evolutionary_algorithm.hpp"
 
 using namespace ea;
@@ -19,77 +27,40 @@ using namespace ea;
 int main()
 {
     std::srand(std::time(0));
-    /*
-    std::vector<basic_individual*> young_adults;
-    for(int i = 0; i < 10; ++i)
+    int success = 0;
+    std::size_t N = 100;
+    for(std::size_t n = 0; n < N; ++n)
     {
-        basic_genotype* gen = random_basic_genotype(32);
-        basic_development dev;
-        basic_phenotype* phen = dev(gen);
-        young_adults.push_back(new basic_individual(gen, phen));
-    }
-    std::cout << "young adults" << std::endl;
-    print_individuals(young_adults);
-
-    std::vector<basic_individual*> adults;
-    for(int i = 0; i < 10; ++i)
-    {
-        basic_genotype* gen = random_basic_genotype(32);
-        basic_development dev;
-        basic_phenotype* phen = dev(gen);
-        adults.push_back(new basic_individual(gen, phen));
-    }
-    std::cout << "adults" << std::endl;
-    print_individuals(adults);
-
-    basic_adult_selection bas;
-    std::vector<basic_individual*> new_adults = bas(young_adults, adults);
-    std::cout << "all" << std::endl;
-    print_individuals(new_adults);
-    free_individuals(new_adults);
-    */
-
-    /*
-    basic_development dev;
-
-    basic_genotype* gen1 = random_basic_genotype(32);
-    basic_phenotype* phen1 = dev(gen1);
-    basic_individual* ind1 = new basic_individual(gen1, phen1);
-    
-    basic_genotype* gen2 = random_basic_genotype(32);
-    basic_phenotype* phen2 = dev(gen2);
-    basic_individual* ind2 = new basic_individual(gen2, phen2);
-    std::cout << "other" << std::endl;
-    std::cout << ind1->info() << std::endl;
-    std::cout << ind2->info() << std::endl;
-    basic_genetic_operator op;
-    genotype_vector children = op(gen1, gen2);
-    basic_genotype* new_geno1 = children[0];
-    basic_genotype* new_geno2 = children[1];
-    basic_phenotype* new_pheno1 = dev(new_geno1);
-    basic_phenotype* new_pheno2 = dev(new_geno2);
-    basic_individual* new_ind1 = new basic_individual(new_geno1, new_pheno1);
-    basic_individual* new_ind2 = new basic_individual(new_geno2, new_pheno2);
-    std::cout << new_ind1->info() << std::endl;
-    std::cout << new_ind2->info() << std::endl;
-    delete ind1;
-    delete ind2;
-    delete new_ind1;
-    delete new_ind2;
-    */
-
-    const std::size_t NUM_CHILDREN = 5;
+    const std::size_t NUM_CHILDREN = 400;
     genotype_vector children;
     for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
-        children.push_back(random_basic_genotype(16));
+        children.push_back(random_basic_genotype(40));
     }
-    evolutionary_algorithm ea;
+    basic_development* bd = new basic_development();
+    basic_fitness* bf = new basic_fitness();
+    basic_adult_selection* bas = new full_generational_replacement();
+    basic_parent_selection* bps = new fitness_proportionate();
+    basic_genetic_operator* bgo = new basic_genetic_operator();
+    basic_ideal_individual* bii = new one_max_ideal();
+    const std::size_t POP_SIZE = 400;
+    evolutionary_algorithm ea(bd, bf, bas, bps, bgo, bii, POP_SIZE);
     ea.init_children(children);
-    const std::size_t NUM_LOOPS = 2;
+    const std::size_t NUM_LOOPS = 100;
     for(std::size_t i = 0; i < NUM_LOOPS; ++i)
     {
-        ea.simulate_generation();
+        //std::cout << "****************** Generation " << i << " *********************" << std::endl;
+        basic_individual* ind = ea.simulate_generation();
+        if(ind)
+        {
+            //std::cout << "Ideal individual found! @" << i << std::endl;
+            ++success;
+            //std::cout << ind->info() << std::endl;
+            break;
+        }
+        if(i == NUM_LOOPS-1) std::cout << "not found" << std::endl;
     }
+    }
+    std::cout << "accuracy: " << success << "/" << N << std::endl;
     return 0;
 }
