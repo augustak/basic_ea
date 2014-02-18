@@ -9,6 +9,7 @@
 #include "basic_parent_selection.hpp"
 #include "basic_genetic_operator.hpp"
 #include "basic_ideal_individual.hpp"
+#include "csv_writer.hpp"
 
 namespace ea
 {
@@ -40,6 +41,8 @@ class evolutionary_algorithm
         const std::size_t POP_SIZE;
         individual_vector population;
         genotype_vector children;
+        // csv writer
+        csv_writer csv;
 };
 
 }

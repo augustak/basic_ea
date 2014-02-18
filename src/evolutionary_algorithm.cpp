@@ -1,5 +1,7 @@
 #include "evolutionary_algorithm.hpp"
 
+#include <cmath>
+
 namespace ea
 {
 
@@ -64,10 +66,22 @@ basic_individual* evolutionary_algorithm::simulate_generation()
     (*adult_selection)(young_adults, population);
     // print averages
     unsigned int fitness_sum = 0;
+    double max_fitness = population[0]->fitness();
     for(std::size_t i = 0; i < population.size(); ++i)
     {
+        if(population[i]->fitness() > max_fitness) max_fitness = population[i]->fitness();
         fitness_sum += population[i]->fitness();
     }
+    std::cout << fitness_sum << " " << population.size() << std::endl;
+    double average_fitness = double(fitness_sum)/population.size();
+    std::cout << average_fitness << std::endl;
+    double std = 0.0;
+    for(std::size_t i = 0; i < population.size(); ++i)
+    {
+        std += std::pow(population[i]->fitness() - average_fitness, 2);
+    }
+    std = std::sqrt(std/population.size());
+    csv.write(3, max_fitness, average_fitness, std);
     //std::cout << "fitness sum: " << fitness_sum << std::endl;
     //print_individuals(population);
     // check for the ideal individual if any

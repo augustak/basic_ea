@@ -24,6 +24,7 @@ sources = Split("""
         src/basic_ideal_individual.cpp
         src/one_max_ideal.cpp
         src/evolutionary_algorithm.cpp
+        src/csv_writer.cpp
 """)
 
 env.Program(target, sources)

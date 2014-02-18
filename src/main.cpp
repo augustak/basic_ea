@@ -21,6 +21,8 @@
 #include "basic_ideal_individual.hpp"
 #include "one_max_ideal.hpp"
 #include "evolutionary_algorithm.hpp"
+#include "csv_writer.hpp"
+
 
 using namespace ea;
 
@@ -28,7 +30,7 @@ int main()
 {
     std::srand(std::time(0));
     int success = 0;
-    std::size_t N = 100;
+    std::size_t N = 1;
     for(std::size_t n = 0; n < N; ++n)
     {
     const std::size_t NUM_CHILDREN = 400;
