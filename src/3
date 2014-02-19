@@ -119,7 +119,7 @@ void evolutionary_algorithm::write_data()
     double max_fitness = (*it)->fitness();
     double avg = average_fitness(population);
     double std = average_fitness(population);
-    csv.write(3, max_fitness, avg, std);
+    csv.write(3, max_fitness, average_fitness, std);
 
     //print_individuals(population);
     for(std::size_t i = 0; i < population.size(); ++i)

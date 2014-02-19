@@ -1,19 +1,24 @@
-#include "fitness_proportionate.hpp"
+#include "sigma_scaling.hpp"
 
 #include <cstdlib>
 
 namespace ea
 {
 
-individual_pair_vector fitness_proportionate::operator()(const individual_vector& adults)
+individual_pair_vector sigma_scaling::operator()(const individual_vector& adults)
 {
     individual_pair_vector parents;
-    float fitness_sum = 0.0;
-    for(std::size_t i = 0; i < adults.size(); ++i)
+
+    std::vector<double> sigmas(adults.size());
+    double avg = average_fitness(adults);
+    double std = standard_deviation(adults);
+    double total_sigma = 0.0;
+    for(std::size_t i = 0; i < sigmas.size(); ++i)
     {
-        fitness_sum += adults[i]->fitness();
+        sigmas[i] = sigma(adults[i], avg, std);
+        total_sigma += sigmas[i];
     }
-    // number of children (parents) to make
+
     const std::size_t NUM_CHILDREN = adults.size();
     for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
@@ -21,7 +26,7 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
         float left_rand = float(rand())/RAND_MAX;
         for(std::size_t j = 0; j < adults.size(); ++j)
         {
-            left_rand -= float(adults[j]->fitness())/fitness_sum;
+            left_rand -= sigmas[j]/total_sigma;
             if(left_rand < 0.0)
             {
                 left_parent = j;
@@ -33,7 +38,7 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
         float right_rand = float(rand())/RAND_MAX;
         for(std::size_t j = 0; j < adults.size(); ++j)
         {
-            right_rand -= float(adults[j]->fitness())/fitness_sum;
+            right_rand -= sigmas[j]/total_sigma;
             if(right_rand < 0.0)
             {
                 right_parent = j;
@@ -47,6 +52,11 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
     }
 
     return parents;
+}
+
+double sigma(basic_individual* individual, double avg, double std)
+{
+    return 1 + ((individual->fitness() - avg) / (2*std));
 }
 
 }

@@ -40,13 +40,17 @@ bool compare_individuals(basic_individual*, basic_individual*);
 // reverse comparison function for basic_individual pointers
 bool reverse_compare_individuals(basic_individual*, basic_individual*);
 
-void free_individual(basic_individual*);
-void free_individuals(std::vector<basic_individual*>&);
-void print_individuals(const std::vector<basic_individual*>&);
-
 typedef std::pair<basic_individual*, basic_individual*> individual_pair;
 typedef std::vector<individual_pair> individual_pair_vector;
 typedef std::vector<basic_individual*> individual_vector;
+
+void free_individual(basic_individual*);
+void free_individuals(std::vector<basic_individual*>&);
+void print_individuals(const std::vector<basic_individual*>&);
+double total_fitness(const individual_vector&);
+double average_fitness(const individual_vector&);
+double standard_deviation(const individual_vector&);
+
 
 }
 

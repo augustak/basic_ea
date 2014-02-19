@@ -13,7 +13,7 @@ individual_pair_vector tournament_selection::operator()(const individual_vector&
     float selection_probability;
     const std::size_t POOL_SIZE = rand() % adults.size();
 
-    for(std::size_t i = 0; i < NUM_CHILDREN; i+=2)
+    for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
         // first parent
         selection_probability = 0.2;

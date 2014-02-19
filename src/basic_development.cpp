@@ -10,7 +10,6 @@ namespace ea
 basic_phenotype* basic_development::operator()(const basic_genotype* gen) const
 {
     std::vector<unsigned int> data;
-    /*
     const int BIT_CHUNK_SIZE = 8;
     for(std::size_t i = 0; i < gen->size()-BIT_CHUNK_SIZE; i+=BIT_CHUNK_SIZE)
     {
@@ -31,13 +30,6 @@ basic_phenotype* basic_development::operator()(const basic_genotype* gen) const
         }
         data.push_back(pheno);
     }
-    */
-    unsigned int sum = 0;
-    for(std::size_t i = 0; i < gen->size(); ++i)
-    {
-        if((*gen)[i] == 1) ++sum;
-    }
-    data.push_back(sum);
     return new basic_phenotype(data);
 }
 

@@ -14,9 +14,9 @@ class basic_adult_selection
         // all the young adults and adults are selected
         virtual void operator()(const std::vector<basic_individual*>&,
                 std::vector<basic_individual*>&) const;
-        void set_population_size(std::size_t size) { POP_SIZE = size; }
+        void set_population_size(std::size_t size) { pop_size_ = size; }
     protected:
-        std::size_t POP_SIZE;
+        std::size_t pop_size_;
 };
 
 }

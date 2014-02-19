@@ -12,11 +12,11 @@ void over_production::operator()(const individual_vector& young_adults,
     population.clear();
     individual_vector copy = young_adults;
     std::sort(copy.begin(), copy.end(), &reverse_compare_individuals);
-    for(std::size_t i = 0; i < POP_SIZE; ++i)
+    for(std::size_t i = 0; i < pop_size_; ++i)
     {
         population.push_back(copy[i]);
     }
-    for(std::size_t i = POP_SIZE; i < copy.size(); ++i)
+    for(std::size_t i = pop_size_; i < copy.size(); ++i)
     {
         free_individual(copy[i]);
     }

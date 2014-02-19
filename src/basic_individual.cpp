@@ -1,5 +1,7 @@
 #include "basic_individual.hpp"
 
+#include <cmath>
+
 namespace ea
 {
 
@@ -60,6 +62,32 @@ void print_individuals(const std::vector<basic_individual*>& individuals)
     {
         std::cout << "id: " << i << "\t\t" << individuals[i]->info() << std::endl;
     }
+}
+
+double total_fitness(const individual_vector& population)
+{
+    double sum = 0.0;
+    for(std::size_t i = 0; i < population.size(); ++i)
+    {
+        sum += population[i]->fitness();
+    }
+    return sum;
+}
+
+double average_fitness(const individual_vector& population)
+{
+    return total_fitness(population) / population.size();
+}
+
+double standard_deviation(const individual_vector& population)
+{
+    double std = 0.0;
+    double avg = average_fitness(population);
+    for(std::size_t i = 0; i < population.size(); ++i)
+    {
+        std += std::pow(population[i]->fitness() - avg, 2);
+    }
+    return std::sqrt(std / population.size());
 }
 
 }

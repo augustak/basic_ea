@@ -10,6 +10,7 @@
 #include "basic_genetic_operator.hpp"
 #include "basic_ideal_individual.hpp"
 #include "csv_writer.hpp"
+#include "debug_writer.hpp"
 
 namespace ea
 {
@@ -18,16 +19,18 @@ class evolutionary_algorithm
 {
     public:
         // constructors
-        evolutionary_algorithm(std::size_t);
+        evolutionary_algorithm(std::size_t, double, double, const std::string&);
         evolutionary_algorithm(basic_development*, basic_fitness*,
                 basic_adult_selection*, basic_parent_selection*,
                 basic_genetic_operator*, basic_ideal_individual*,
-                std::size_t);
+                std::size_t, double, double, const std::string&);
         ~evolutionary_algorithm();
         // TEH function
         basic_individual* simulate_generation();
         // modifiers
         void init_children(const genotype_vector& child) { children = child; }
+        // write data
+        void write_data();
     private:
         // evolutionary algorithms
         basic_development* development;
@@ -39,10 +42,13 @@ class evolutionary_algorithm
         basic_ideal_individual* ideal_individual;
         // population and size
         const std::size_t POP_SIZE;
+        const double MUTATION_RATE;
+        const double CROSSOVER_RATE;
         individual_vector population;
         genotype_vector children;
         // csv writer
         csv_writer csv;
+        debug_writer debug;
 };
 
 }

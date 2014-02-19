@@ -1,19 +1,27 @@
-#include "fitness_proportionate.hpp"
+#include "boltzmann_scaling.hpp"
 
+#include <cmath>
 #include <cstdlib>
 
 namespace ea
 {
+boltzmann_scaling::boltzmann_scaling(double t, double d_t) :
+    temp_(t), d_temp_(d_t) 
+{
+}
 
-individual_pair_vector fitness_proportionate::operator()(const individual_vector& adults)
+individual_pair_vector boltzmann_scaling::operator()(const individual_vector& adults)
 {
     individual_pair_vector parents;
-    float fitness_sum = 0.0;
-    for(std::size_t i = 0; i < adults.size(); ++i)
+
+    std::vector<double> boltzmanns(adults.size());
+    double total_boltzmann = 0.0;
+    for(std::size_t i = 0; i < boltzmanns.size(); ++i)
     {
-        fitness_sum += adults[i]->fitness();
+        boltzmanns[i] = std::pow(M_E, double(adults[i]->fitness())/temp_);
+        total_boltzmann += boltzmanns[i];
     }
-    // number of children (parents) to make
+
     const std::size_t NUM_CHILDREN = adults.size();
     for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
@@ -21,7 +29,7 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
         float left_rand = float(rand())/RAND_MAX;
         for(std::size_t j = 0; j < adults.size(); ++j)
         {
-            left_rand -= float(adults[j]->fitness())/fitness_sum;
+            left_rand -= boltzmanns[j]/total_boltzmann;
             if(left_rand < 0.0)
             {
                 left_parent = j;
@@ -33,7 +41,7 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
         float right_rand = float(rand())/RAND_MAX;
         for(std::size_t j = 0; j < adults.size(); ++j)
         {
-            right_rand -= float(adults[j]->fitness())/fitness_sum;
+            right_rand -= boltzmanns[j]/total_boltzmann;
             if(right_rand < 0.0)
             {
                 right_parent = j;
@@ -45,7 +53,8 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
 
         parents.push_back(std::make_pair(adults[left_parent], adults[right_parent]));
     }
-
+    temp_ -= d_temp_;
+    if(temp_ <= 0) temp_ = 0.1;
     return parents;
 }
 
