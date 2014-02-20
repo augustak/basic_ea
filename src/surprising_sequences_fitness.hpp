@@ -30,10 +30,17 @@ class triple
         }
 };
 
-class surprising_sequences_fitness : public basic_fitness
+class surprising_sequences_local_fitness : public basic_fitness
 {
     public:
-        virtual ~surprising_sequences_fitness() {}
+        virtual ~surprising_sequences_local_fitness() {}
+        virtual int operator()(const basic_phenotype*) const;
+};
+
+class surprising_sequences_global_fitness : public basic_fitness
+{
+    public:
+        virtual ~surprising_sequences_global_fitness() {}
         virtual int operator()(const basic_phenotype*) const;
 };
 

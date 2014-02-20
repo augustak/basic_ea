@@ -22,7 +22,7 @@ individual_pair_vector boltzmann_scaling::operator()(const individual_vector& ad
         total_boltzmann += boltzmanns[i];
     }
 
-    const std::size_t NUM_CHILDREN = adults.size();
+    const std::size_t NUM_CHILDREN = adults.size() * children_multiplier_;
     for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
         int left_parent = rand() % adults.size();

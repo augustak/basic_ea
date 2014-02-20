@@ -5,11 +5,18 @@
 namespace ea
 {
 
-int surprising_sequences_fitness::operator()(const basic_phenotype* phen) const
+int surprising_sequences_local_fitness::operator()(const basic_phenotype* phen) const
+{
+    int fitness = max_local_fitness(phen->size()) - local_conflicts(phen);
+    return fitness;
+}
+
+int surprising_sequences_global_fitness::operator()(const basic_phenotype* phen) const
 {
     int fitness = max_global_fitness(phen->size()) - global_conflicts(phen);
     return fitness;
 }
+
 
 unsigned int local_conflicts(const basic_phenotype* phenotype)
 {

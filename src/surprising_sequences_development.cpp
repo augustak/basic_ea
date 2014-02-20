@@ -8,7 +8,7 @@ namespace ea
 {
 
 surprising_sequences_development::surprising_sequences_development(std::size_t num_symbols) :
-    basic_development(num_symbols)
+    basic_development(num_symbols-1)
 {
 }
 

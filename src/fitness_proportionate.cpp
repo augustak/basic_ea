@@ -14,7 +14,7 @@ individual_pair_vector fitness_proportionate::operator()(const individual_vector
         fitness_sum += adults[i]->fitness();
     }
     // number of children (parents) to make
-    const std::size_t NUM_CHILDREN = adults.size();
+    const std::size_t NUM_CHILDREN = adults.size() * children_multiplier_;
     for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
         int left_parent = rand() % adults.size();

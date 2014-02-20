@@ -9,7 +9,7 @@ namespace ea
 individual_pair_vector tournament_selection::operator()(const individual_vector& adults)
 {
     individual_pair_vector parents;
-    const std::size_t NUM_CHILDREN = adults.size();
+    const std::size_t NUM_CHILDREN = adults.size() * children_multiplier_;
     float selection_probability;
     const std::size_t POOL_SIZE = rand() % adults.size();
 

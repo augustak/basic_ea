@@ -9,7 +9,7 @@ namespace ea
 class csv_writer
 {
     public:
-        csv_writer() : out_file("ea_data.csv") {}
+        csv_writer(const std::string& out) : out_file(out + ".csv") {}
         ~csv_writer() { out_file.close(); }
         void write(std::size_t, ...);
     private:

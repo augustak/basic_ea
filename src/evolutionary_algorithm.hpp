@@ -19,11 +19,11 @@ class evolutionary_algorithm
 {
     public:
         // constructors
-        evolutionary_algorithm(std::size_t, double, double, const std::string&, bool);
+        evolutionary_algorithm(std::size_t, double, double, double, const std::string&, bool);
         evolutionary_algorithm(basic_development*, basic_fitness*,
                 basic_adult_selection*, basic_parent_selection*,
                 basic_genetic_operator*, basic_ideal_individual*,
-                std::size_t, double, double, const std::string&, bool);
+                std::size_t, double, double, double, const std::string&, bool);
         ~evolutionary_algorithm();
         // TEH function
         basic_individual* simulate_generation();
@@ -44,6 +44,7 @@ class evolutionary_algorithm
         const std::size_t POP_SIZE;
         const double MUTATION_RATE;
         const double CROSSOVER_RATE;
+        const double CHILDREN_MULTIPLIER;
         individual_vector population;
         genotype_vector children;
         // csv writer

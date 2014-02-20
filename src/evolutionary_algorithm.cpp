@@ -10,7 +10,8 @@ namespace ea
 {
 
 evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
-        double mut_rate, double cross_rate, const std::string& out, bool dflag) :
+        double mut_rate, double cross_rate, double children_mult, 
+        const std::string& out, bool dflag) :
     development(new basic_development(DEFAULT_BIT_CHUNK_SIZE)),
     fitness(new basic_fitness()),
     adult_selection(new basic_adult_selection()),
@@ -20,19 +21,23 @@ evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
     POP_SIZE(size),
     MUTATION_RATE(mut_rate),
     CROSSOVER_RATE(cross_rate),
+    CHILDREN_MULTIPLIER(children_mult),
+    csv(out),
     debug(out),
     debug_flag(dflag)
 {
     adult_selection->set_population_size(POP_SIZE);
     genetic_operator->set_mutation_rate(MUTATION_RATE);
     genetic_operator->set_crossover_rate(CROSSOVER_RATE);
+    parent_selection->set_children_multiplier(CHILDREN_MULTIPLIER);
 }
 
 evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
         basic_fitness* fit, basic_adult_selection* adult,
         basic_parent_selection* parent, basic_genetic_operator* gen,
         basic_ideal_individual* ideal, std::size_t size,
-        double mut_rate, double cross_rate, const std::string& out, bool dflag) :
+        double mut_rate, double cross_rate, double children_mult,
+        const std::string& out, bool dflag) :
     development(dev),
     fitness(fit),
     adult_selection(adult),
@@ -42,12 +47,15 @@ evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
     POP_SIZE(size),
     MUTATION_RATE(mut_rate),
     CROSSOVER_RATE(cross_rate),
+    CHILDREN_MULTIPLIER(children_mult),
+    csv(out),
     debug(out),
     debug_flag(dflag)
 {
     adult_selection->set_population_size(POP_SIZE);
     genetic_operator->set_mutation_rate(MUTATION_RATE);
     genetic_operator->set_crossover_rate(CROSSOVER_RATE);
+    parent_selection->set_children_multiplier(CHILDREN_MULTIPLIER);
 }
 
 
