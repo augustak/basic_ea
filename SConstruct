@@ -13,7 +13,9 @@ sources = Split("""
         src/basic_individual.cpp
         src/basic_development.cpp
         src/one_max_development.cpp
+        src/surprising_sequences_development.cpp
         src/basic_fitness.cpp
+        src/surprising_sequences_fitness.cpp
         src/basic_adult_selection.cpp
         src/full_generational_replacement.cpp
         src/over_production.cpp
@@ -26,6 +28,7 @@ sources = Split("""
         src/basic_genetic_operator.cpp
         src/basic_ideal_individual.cpp
         src/one_max_ideal.cpp
+        src/surprising_sequences_ideal.cpp
         src/evolutionary_algorithm.cpp
         src/csv_writer.cpp
         src/debug_writer.cpp

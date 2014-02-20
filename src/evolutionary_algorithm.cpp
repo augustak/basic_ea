@@ -10,8 +10,8 @@ namespace ea
 {
 
 evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
-        double mut_rate, double cross_rate, const std::string& out) :
-    development(new basic_development()),
+        double mut_rate, double cross_rate, const std::string& out, bool dflag) :
+    development(new basic_development(DEFAULT_BIT_CHUNK_SIZE)),
     fitness(new basic_fitness()),
     adult_selection(new basic_adult_selection()),
     parent_selection(new basic_parent_selection()),
@@ -20,7 +20,8 @@ evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
     POP_SIZE(size),
     MUTATION_RATE(mut_rate),
     CROSSOVER_RATE(cross_rate),
-    debug(out)
+    debug(out),
+    debug_flag(dflag)
 {
     adult_selection->set_population_size(POP_SIZE);
     genetic_operator->set_mutation_rate(MUTATION_RATE);
@@ -31,7 +32,7 @@ evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
         basic_fitness* fit, basic_adult_selection* adult,
         basic_parent_selection* parent, basic_genetic_operator* gen,
         basic_ideal_individual* ideal, std::size_t size,
-        double mut_rate, double cross_rate, const std::string& out) :
+        double mut_rate, double cross_rate, const std::string& out, bool dflag) :
     development(dev),
     fitness(fit),
     adult_selection(adult),
@@ -41,7 +42,8 @@ evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
     POP_SIZE(size),
     MUTATION_RATE(mut_rate),
     CROSSOVER_RATE(cross_rate),
-    debug(out)
+    debug(out),
+    debug_flag(dflag)
 {
     adult_selection->set_population_size(POP_SIZE);
     genetic_operator->set_mutation_rate(MUTATION_RATE);
@@ -120,13 +122,25 @@ void evolutionary_algorithm::write_data()
     double avg = average_fitness(population);
     double std = average_fitness(population);
     csv.write(3, max_fitness, avg, std);
-
-    //print_individuals(population);
-    for(std::size_t i = 0; i < population.size(); ++i)
+    if(debug_flag)
     {
-        sstream ss;
-        ss << "id: " << i << "\t\t" << population[i]->info();
-        debug.write(1, ss.str().c_str());
+        //print_individuals(population);
+        for(std::size_t i = 0; i < population.size(); ++i)
+        {
+            sstream ss;
+            ss << "id: " << i << "\tphenotype:\t";
+            for(std::size_t j = 0; j < population[i]->phenotype()->size(); ++j)
+            {
+                ss << " " << (*population[i]->phenotype())[j];
+            }
+            ss << "\tgenotype:";
+            for(std::size_t j = 0; j < population[i]->genotype()->size(); ++j)
+            {
+                if(j % development->bit_chunk_size()==0) ss << " ";
+                ss << (*population[i]->genotype())[j];
+            }
+            debug.write(1, ss.str().c_str());
+        }
     }
 }
 

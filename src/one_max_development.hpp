@@ -11,6 +11,7 @@ namespace ea
 class one_max_development : public basic_development
 {
     public:
+        one_max_development(std::size_t size) : basic_development(size) {}
         virtual ~one_max_development() {}
         virtual basic_phenotype* operator()(const basic_genotype*) const;
 };
