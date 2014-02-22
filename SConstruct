@@ -16,6 +16,7 @@ sources = Split("""
         src/surprising_sequences_development.cpp
         src/basic_fitness.cpp
         src/surprising_sequences_fitness.cpp
+        src/bit_string_fitness.cpp
         src/basic_adult_selection.cpp
         src/full_generational_replacement.cpp
         src/over_production.cpp

@@ -17,6 +17,7 @@ typedef std::stringstream sstream;
 #include "basic_individual.hpp"
 #include "basic_fitness.hpp"
 #include "surprising_sequences_fitness.hpp"
+#include "bit_string_fitness.hpp"
 #include "basic_adult_selection.hpp"
 #include "full_generational_replacement.hpp"
 #include "over_production.hpp"
@@ -46,7 +47,7 @@ unsigned int runs = 1; // number of runs
 unsigned int generations = 50; // number of generations
 bool inc_diff = false; // whether to run once or increase problem difficulty incrementally
 int dev_tt = 0; // 0 = basic, 1 = one_max, 2 = surprising
-int fit_t = 0; // 0 = basic, 1 = surprising
+int fit_t = 0; // 0 = basic, 1 = surprising, 2 = bit string
 int adult_t = 0; // 0 = basic, 1 = full replace, 2 = over prod, 3 = gen mix
 int parent_t = 0; // 0 = basic, 1 = tournament, 2 = fitness prop, 3 = sigma, 4 = boltzmann
 //int gen_t = 0; // 0 = basic
@@ -61,9 +62,23 @@ double cross_rate = 0.5; // crossover rate
 double init_temp = 100.0; // init temp for boltzmann
 double d_temp = 2.5; // delta temp for boltzmann
 bool dflag = false; // debug flag
-std::string out = "null"; // debug output file
+std::string out = "stdout"; // debug output file
+std::string csv = "csv_data"; // csv output file
+std::string res = "results"; // results output file
 int ss_type = 0; // 0 = local, 1 = global
 double child_m = 1.0; // children multiplier
+bool break_t = false; // break loop upon found individual
+std::vector<bool> bit_string; // bit string
+
+std::vector<bool> random_bit_string(std::size_t size)
+{
+    std::vector<bool> ret;
+    for(std::size_t i = 0; i < size; ++i)
+    {
+        ret.push_back(rand() < (RAND_MAX/2) ? 1 : 0);
+    }
+    return ret;
+}
 
 void options(int argc, char** argv)
 {
@@ -83,6 +98,13 @@ void options(int argc, char** argv)
             fit_t = 1;
             ideal_t = 2;
         }
+        else if(!strcmp(argv[i], "--bs"))
+        {
+            problem_t = 0;
+            dev_tt = 1;
+            fit_t = 2;
+            ideal_t = 1;
+        }
         else if(!strcmp(argv[i], "--local"))
         {
             ss_type = 0;
@@ -101,6 +123,26 @@ void options(int argc, char** argv)
             sstream ss(argv[i+1]);
             ss >> out;
             dflag = true;
+        }
+        else if(!strcmp(argv[i], "--csv"))
+        {
+            if(i+1 >= argc)
+            {
+                usage_error();
+                exit(0);
+            }
+            sstream ss(argv[i+1]);
+            ss >> csv;
+        }
+        else if(!strcmp(argv[i], "--res"))
+        {
+            if(i+1 >= argc)
+            {
+                usage_error();
+                exit(0);
+            }
+            sstream ss(argv[i+1]);
+            ss >> res;
         }
         else if(!strcmp(argv[i], "--pop_size") || !strcmp(argv[i], "--popsize") || !strcmp(argv[i], "--ps"))
         {
@@ -167,6 +209,7 @@ void options(int argc, char** argv)
             }
             sstream ss(argv[i+1]);
             ss >> bits;
+            bit_string = random_bit_string(bits);
             ++i;
         }
         else if(!strcmp(argv[i], "--mut") || !strcmp(argv[i], "--mutrate") || !strcmp(argv[i], "--mr"))
@@ -234,6 +277,10 @@ void options(int argc, char** argv)
         {
             inc_diff = true;
         }
+        else if(!strcmp(argv[i], "--break"))
+        {
+            break_t = true;
+        }
     }
 }
 
@@ -260,6 +307,7 @@ evolutionary_algorithm* create_ea()
             if(ss_type == 0) bf = new surprising_sequences_local_fitness();
             else if(ss_type == 1) bf = new surprising_sequences_global_fitness();
         } break;
+        case 2: bf = new bit_string_fitness(bit_string); break;
         default: std::cerr << "bad input" << std::endl; break;
     }
     switch(adult_t)
@@ -296,7 +344,7 @@ evolutionary_algorithm* create_ea()
     {
         children.push_back(random_basic_genotype(bits));
     }
-    evolutionary_algorithm* ea = new evolutionary_algorithm(bd, bf, bas, bps, bgo, bii, pop_size, mut_rate, cross_rate, child_m, out, dflag);
+    evolutionary_algorithm* ea = new evolutionary_algorithm(bd, bf, bas, bps, bgo, bii, pop_size, mut_rate, cross_rate, child_m, out, dflag, csv);
     ea->init_children(children);
     return ea;
 }
@@ -322,10 +370,12 @@ std::string info_om(basic_individual* ind, unsigned int bit_chunk)
 {
     sstream ss;
     ss << "phenotype:\t";
+    unsigned int sum = 0;
     for(std::size_t j = 0; j < ind->phenotype()->size(); ++j)
     {
-        ss << " " << (*ind->phenotype())[j];
+        if((*ind->phenotype())[j] == 1) ++sum;
     }
+    ss << sum;
     ss << "\tgenotype:";
     for(std::size_t j = 0; j < ind->genotype()->size(); ++j)
     {
@@ -335,7 +385,6 @@ std::string info_om(basic_individual* ind, unsigned int bit_chunk)
     return ss.str();
 }
 
-
 int main(int argc, char** argv)
 {
 
@@ -344,27 +393,31 @@ int main(int argc, char** argv)
     options(argc, argv);
     if(!inc_diff)
     {
-        evolutionary_algorithm* ea = create_ea();
+        std::ofstream file(res.c_str());
+        evolutionary_algorithm* ea;
         int success = 0;
         bool found = false;
         for(std::size_t n = 0; n < runs; ++n)
         {
+            ea = create_ea();
             for(std::size_t i = 0; i < generations; ++i)
             {
                 basic_individual* ind = ea->simulate_generation();
                 if(ind)
                 {
                     found = true;
-                    if(problem_t == 0) std::cout << info_om(ind, DEFAULT_BIT_CHUNK_SIZE) << std::endl;
-                    else if(problem_t == 1) std::cout << info_ss(ind, symbols-1) << std::endl;
+                    if(problem_t == 0) file << info_om(ind, DEFAULT_BIT_CHUNK_SIZE) << std::endl;
+                    else if(problem_t == 1) file << info_ss(ind, symbols-1) << std::endl;
                     ++success;
                     break;
                 }
             }
-            if(found) break;
+            delete ea;
+            if(found && break_t) break;
+            found = false;
         }
+        file.close();
         std::cout << "accuracy: " << success << "/" << runs << " = " << float(success)/float(runs) << std::endl;
-        delete ea;
     }
     else
     {
@@ -372,7 +425,7 @@ int main(int argc, char** argv)
         evolutionary_algorithm* ea;
         int count = 0;
         std::vector<std::string> results;
-        std::ofstream file("results.txt");
+        std::ofstream file(res.c_str());
         do
         {
             found = false;
@@ -388,21 +441,22 @@ int main(int argc, char** argv)
                     if(ind)
                     {
                         if(problem_t == 0) file << info_om(ind, DEFAULT_BIT_CHUNK_SIZE) << std::endl;
-                        else if(problem_t == 1) file << info_ss(ind, symbols-1) << std::endl;
+                        else if(problem_t == 1) file << info_ss(ind, SS_BIT_CHUNK) << std::endl;
                         found = true;
                         ++success;
                         break;
                     }
                 }
                 delete ea;
-                if(found) break;
+                if(found && break_t) break;
+                found = false;
             }
             sstream ss;
             ss << "stage: " << count << " accuracy: " << float(success)/float(runs);
             std::cout << ss.str() << std::endl;
             results.push_back(ss.str());
             ++count;
-            if(problem_t == 1) bits += (symbols-1);
+            if(problem_t == 1) bits += SS_BIT_CHUNK;
             else if(problem_t == 0) ++bits;
         } 
         while(found);

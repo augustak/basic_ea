@@ -11,7 +11,7 @@ namespace ea
 
 evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
         double mut_rate, double cross_rate, double children_mult, 
-        const std::string& out, bool dflag) :
+        const std::string& out, bool dflag, const std::string& csv_out) :
     development(new basic_development(DEFAULT_BIT_CHUNK_SIZE)),
     fitness(new basic_fitness()),
     adult_selection(new basic_adult_selection()),
@@ -22,7 +22,7 @@ evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
     MUTATION_RATE(mut_rate),
     CROSSOVER_RATE(cross_rate),
     CHILDREN_MULTIPLIER(children_mult),
-    csv(out),
+    csv(csv_out),
     debug(out),
     debug_flag(dflag)
 {
@@ -37,7 +37,7 @@ evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
         basic_parent_selection* parent, basic_genetic_operator* gen,
         basic_ideal_individual* ideal, std::size_t size,
         double mut_rate, double cross_rate, double children_mult,
-        const std::string& out, bool dflag) :
+        const std::string& out, bool dflag, const std::string& csv_out) :
     development(dev),
     fitness(fit),
     adult_selection(adult),
@@ -48,7 +48,7 @@ evolutionary_algorithm::evolutionary_algorithm(basic_development* dev,
     MUTATION_RATE(mut_rate),
     CROSSOVER_RATE(cross_rate),
     CHILDREN_MULTIPLIER(children_mult),
-    csv(out),
+    csv(csv_out),
     debug(out),
     debug_flag(dflag)
 {
