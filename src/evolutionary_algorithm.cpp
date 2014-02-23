@@ -128,8 +128,8 @@ void evolutionary_algorithm::write_data()
             &compare_individuals);
     double max_fitness = (*it)->fitness();
     double avg = average_fitness(population);
-    double std = average_fitness(population);
-    csv.write(3, max_fitness, avg, std);
+    double std = standard_deviation(population);
+    csv.write(3, avg, std, max_fitness);
     if(debug_flag)
     {
         //print_individuals(population);

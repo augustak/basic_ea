@@ -187,6 +187,7 @@ void options(int argc, char** argv)
             }
             sstream ss(argv[i+1]);
             ss >> symbols;
+            bits = SS_BIT_CHUNK;
             ++i;
         }
         else if(!strcmp(argv[i], "--generations") || !strcmp(argv[i], "--gen"))
@@ -414,7 +415,6 @@ int main(int argc, char** argv)
             }
             delete ea;
             if(found && break_t) break;
-            found = false;
         }
         file.close();
         std::cout << "accuracy: " << success << "/" << runs << " = " << float(success)/float(runs) << std::endl;
@@ -449,7 +449,6 @@ int main(int argc, char** argv)
                 }
                 delete ea;
                 if(found && break_t) break;
-                found = false;
             }
             sstream ss;
             ss << "stage: " << count << " accuracy: " << float(success)/float(runs);
