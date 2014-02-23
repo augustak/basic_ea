@@ -11,53 +11,50 @@ individual_pair_vector tournament_selection::operator()(const individual_vector&
     individual_pair_vector parents;
     const std::size_t NUM_CHILDREN = adults.size() * children_multiplier_;
     float selection_probability;
-    const std::size_t POOL_SIZE = rand() % adults.size();
+    const std::size_t POOL_SIZE = double(adults.size()) * POOL_MULTIPLIER;
+    individual_vector pool;
+    for(std::size_t j = 0; j < POOL_SIZE; ++j)
+    {
+        pool.push_back(adults[rand() % adults.size()]);
+    }
+    std::sort(pool.begin(), pool.end(), &reverse_compare_individuals);
 
     for(std::size_t i = 0; i < NUM_CHILDREN; ++i)
     {
         // first parent
-        selection_probability = 0.2;
+        selection_probability = P;
         std::size_t left_parent = 0;
-        individual_vector pool;
-        for(std::size_t j = 0; j < POOL_SIZE; ++j)
-        {
-            pool.push_back(adults[rand() % adults.size()]);
-        }
-        std::sort(pool.begin(), pool.end(), &reverse_compare_individuals);
+        float random = float(rand())/RAND_MAX;
         for(std::size_t j = 0; j < pool.size(); ++j)
         {
-            float random = float(rand())/RAND_MAX;
-            if(random < selection_probability)
+            random -= selection_probability;
+            if(random < 0)
             {
                 left_parent = j;
                 break;
             }
-            selection_probability *= (1.0 - selection_probability);
+            selection_probability *= (1-P);
         }
-        // clear pool
-        pool.clear();
 
         // second parent
         // reset selection probability
-        selection_probability = 0.2;
+        selection_probability = P;
         std::size_t right_parent = 0;
-        for(std::size_t j = 0; j < POOL_SIZE; ++j)
-        {
-            pool.push_back(adults[rand() % adults.size()]);
-        }
-        std::sort(pool.begin(), pool.end(), &reverse_compare_individuals);
+        random = float(rand())/RAND_MAX;
         for(std::size_t j = 0; j < pool.size(); ++j)
         {
-            float random = float(rand())/RAND_MAX;
-            if(random < selection_probability)
+            random -= selection_probability;
+            if(random < 0)
             {
                 right_parent = j;
                 break;
             }
-            selection_probability *= (1.0 - selection_probability);
+            selection_probability *= (1-P);
         }
+
+        while(left_parent == right_parent) right_parent = rand()%pool.size();
         
-        parents.push_back(std::make_pair(adults[left_parent], adults[right_parent]));
+        parents.push_back(std::make_pair(pool[left_parent], pool[right_parent]));
     }
 
     return parents;

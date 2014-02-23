@@ -69,6 +69,8 @@ int ss_type = 0; // 0 = local, 1 = global
 double child_m = 1.0; // children multiplier
 bool break_t = false; // break loop upon found individual
 std::vector<bool> bit_string; // bit string
+double pool_mult = 1.0; // tournament pool mult
+double p = 0.5;
 
 std::vector<bool> random_bit_string(std::size_t size)
 {
@@ -250,6 +252,17 @@ void options(int argc, char** argv)
         else if(!strcmp(argv[i], "--tournament"))
         {
             parent_t = 1;
+            if(i+2 >= argc)
+            {
+                usage_error();
+                exit(0);
+            }
+            sstream ss0(argv[i+1]);
+            sstream ss1(argv[i+2]);
+            ss0 >> pool_mult;
+            ss1 >> p;
+            ++i;
+            ++i;
         }
         else if(!strcmp(argv[i], "--fitnessprop"))
         {
@@ -322,7 +335,7 @@ evolutionary_algorithm* create_ea()
     switch(parent_t)
     {
         case 0: bps = new basic_parent_selection(); break;
-        case 1: bps = new tournament_selection(); break;
+        case 1: bps = new tournament_selection(pool_mult, p); break;
         case 2: bps = new fitness_proportionate(); break;
         case 3: bps = new sigma_scaling(); break;
         case 4: bps = new boltzmann_scaling(init_temp, d_temp); break;
@@ -466,5 +479,36 @@ int main(int argc, char** argv)
             std::cout << results[i] << std::endl;
         }
     }
+    std::fstream full_data("avg" + csv + ".csv", std::fstream::out);
+    for(std::size_t i = 0; i < generations; ++i)
+    {
+        double total_avg = 0.0;
+        double n_avg = 0;
+        double total_std = 0.0;
+        double n_std = 0;
+        double total_max = 0.0;
+        double n_max = 0;
+
+        for(std::size_t j = 0; j < csv_data.size(); ++j)
+        {
+            if(i < csv_data[j].size())
+            {
+                total_avg += csv_data[j][i].avg;
+                ++n_avg;
+                total_std += csv_data[j][i].std;
+                ++n_std;
+                total_max += csv_data[j][i].max;
+                ++n_max;
+            }
+            else
+            {
+                total_max += 40.0;
+                ++n_max;
+            }
+        }
+        if(n_avg == 0) break;
+        full_data << total_avg/n_avg << "," << total_std/n_std << "," << total_max/n_max << std::endl;
+    }
+    full_data.close();
     return 0;
 }
