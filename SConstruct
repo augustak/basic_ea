@@ -1,9 +1,9 @@
 env = Environment()
 env.Replace(CXX = "g++-4.8")
 
-env['CXXFLAGS'] = '-g -ggdb -Wall -pedantic -std=c++0x'
+env['CXXFLAGS'] = '-fPIC -g -ggdb -Wall -pedantic -std=c++0x'
 # env['LIBS']     = 'sfml-window', 'sfml-system'  # 'SDL m ...'
-
+lib_target = 'basic_ea'
 target  = 'ea'
 
 sources = Split("""
@@ -36,3 +36,5 @@ sources = Split("""
 """)
 
 env.Program(target, sources)
+env.SharedLibrary(lib_target, sources)
+env.StaticLibrary(lib_target, sources)

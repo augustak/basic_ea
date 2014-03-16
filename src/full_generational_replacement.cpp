@@ -1,5 +1,7 @@
 #include "full_generational_replacement.hpp"
 
+#include <algorithm>
+
 namespace ea
 {
 

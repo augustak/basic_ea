@@ -6,7 +6,7 @@ function [] = plot_ea_data(filename)
     title(filename)
     xlabel('Generation')
     ylabel('Fitness')
-    outfile = strcat(filename, '.jpg')
+    outfile = strcat('jpg/', filename, '.jpg')
     print(outfile,'-djpg')
 end
 

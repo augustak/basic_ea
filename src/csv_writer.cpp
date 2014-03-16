@@ -9,7 +9,7 @@ namespace ea
 std::vector<std::vector<data>> csv_data;
 
 csv_writer::csv_writer(const std::string& out) :
-    out_file(out + ".csv")
+    out_file("csv/" + out + ".csv")
 {
 }
 

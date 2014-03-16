@@ -14,7 +14,7 @@ evolutionary_algorithm::evolutionary_algorithm(std::size_t size,
         const std::string& out, bool dflag, const std::string& csv_out) :
     development(new basic_development(DEFAULT_BIT_CHUNK_SIZE)),
     fitness(new basic_fitness()),
-    adult_selection(new basic_adult_selection()),
+    adult_selection(new basic_adult_selection(false, 0)),
     parent_selection(new basic_parent_selection()),
     genetic_operator(new basic_genetic_operator()),
     ideal_individual(new basic_ideal_individual()),

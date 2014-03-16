@@ -71,6 +71,8 @@ bool break_t = false; // break loop upon found individual
 std::vector<bool> bit_string; // bit string
 double pool_mult = 1.0; // tournament pool mult
 double p = 0.5;
+bool elitism = false;
+std::size_t elite_count = 1;
 
 std::vector<bool> random_bit_string(std::size_t size)
 {
@@ -237,6 +239,19 @@ void options(int argc, char** argv)
             ss >> cross_rate;
             ++i;
         }
+        else if(!strcmp(argv[i], "--elitism"))
+        {
+            elitism = true;
+            if(i+1 >= argc)
+            {
+                usage_error();
+                exit(0);
+            }
+            sstream ss(argv[i+1]);
+            ss >> elite_count;
+            ++i;
+        }
+
         else if(!strcmp(argv[i], "--fullreplace"))
         {
             adult_t = 1;
@@ -326,10 +341,10 @@ evolutionary_algorithm* create_ea()
     }
     switch(adult_t)
     {
-        case 0: bas = new basic_adult_selection(); break;
-        case 1: bas = new full_generational_replacement(); break;
-        case 2: bas = new over_production(); break;
-        case 3: bas = new generational_mixing(); break;
+        case 0: bas = new basic_adult_selection(elitism, elite_count); break;
+        case 1: bas = new full_generational_replacement(elitism, elite_count); break;
+        case 2: bas = new over_production(elitism, elite_count); break;
+        case 3: bas = new generational_mixing(elitism, elite_count); break;
         default: std::cerr << "bad input" << std::endl; break;
     }
     switch(parent_t)
