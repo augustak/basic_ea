@@ -36,5 +36,4 @@ sources = Split("""
 """)
 
 env.Program(target, sources)
-env.SharedLibrary(lib_target, sources)
 env.StaticLibrary(lib_target, sources)
